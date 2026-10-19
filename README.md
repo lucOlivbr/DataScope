@@ -1,5 +1,9 @@
 # 📊 DataScope — Internet Access Analytics
 
+### 🚀 Demonstração online
+
+👉 [Acessar o DataScope — Dashboard Interativo](https://datascope-lucolivbr.streamlit.app/)
+
 Dashboard interativo para explorar a evolução do uso da internet no Brasil, Argentina e Chile, utilizando dados públicos do Banco Mundial.
 
 ![Dashboard DataScope](assets/dashboard.png)
