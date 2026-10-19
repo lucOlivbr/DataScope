@@ -104,15 +104,34 @@ st.markdown("""
 # CARREGAR DADOS DO SQLITE
 # --------------------------------------------------
 
+
 @st.cache_data
 def carregar_dados():
-    caminho = Path(__file__).parent / "datascope.db"
+    pasta = Path(__file__).parent
+    banco = pasta / "datascope.db"
+    csv = pasta / "dados" / "acesso_internet.csv"
 
-    with sqlite3.connect(caminho) as conexao:
-        dados = pd.read_sql_query(
-            'SELECT * FROM acesso_internet',
-            conexao
-        )
+    if banco.exists():
+        with sqlite3.connect(banco) as conexao:
+            dados = pd.read_sql_query(
+                "SELECT * FROM acesso_internet",
+                conexao
+            )
+    else:
+        # Na nuvem, recria a tabela SQL a partir do CSV
+        origem = pd.read_csv(csv)
+
+        with sqlite3.connect(":memory:") as conexao:
+            origem.to_sql(
+                "acesso_internet",
+                conexao,
+                if_exists="replace",
+                index=False
+            )
+            dados = pd.read_sql_query(
+                "SELECT * FROM acesso_internet",
+                conexao
+            )
 
     dados["Ano"] = dados["Ano"].astype(int)
     dados["Acesso à Internet (%)"] = pd.to_numeric(
