@@ -1,9 +1,10 @@
 
 import sqlite3
 import pandas as pd
+from qualidade_dados import validar_dados
 
 # Carregar os dados coletados
-df = pd.read_csv("dados/acesso_internet.csv")
+df = validar_dados(pd.read_csv("dados/acesso_internet.csv"))
 
 # Criar o banco e executar a análise
 with sqlite3.connect("datascope.db") as conexao:
@@ -39,3 +40,4 @@ with sqlite3.connect("datascope.db") as conexao:
 print("\nRanking no ano mais recente em comum:")
 print(resultado.to_string(index=False))
 print("\nConsulta SQL executada com sucesso!")
+

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from qualidade_dados import validar_dados
 
 # --------------------------------------------------
 # CONFIGURAÇÃO
@@ -133,13 +134,7 @@ def carregar_dados():
                 conexao
             )
 
-    dados["Ano"] = dados["Ano"].astype(int)
-    dados["Acesso à Internet (%)"] = pd.to_numeric(
-        dados["Acesso à Internet (%)"],
-        errors="coerce"
-    )
-
-    return dados.dropna().sort_values("Ano")
+    return validar_dados(dados)
 
 
 try:
@@ -434,3 +429,4 @@ st.download_button(
 st.caption(
     "DataScope v2.0 · Python · Pandas · SQLite · Streamlit"
 )
+

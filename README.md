@@ -19,6 +19,7 @@ O projeto combina coleta de dados via API, tratamento com Python e Pandas, armaz
 - Ranking e indicadores calculados a partir dos dados.
 - Insights descritivos automáticos.
 - Exportação dos dados filtrados em CSV.
+- Contrato de qualidade compartilhado entre coleta, carga SQL e dashboard: tipos, valores ausentes, países, anos, percentuais e duplicatas.
 
 ## Tecnologias
 
@@ -82,8 +83,23 @@ Esses resultados são descritivos e não demonstram relações de causa e efeito
 
 Projeto de portfólio desenvolvido para praticar conceitos de ciência de dados, integração com APIs, análise exploratória, SQL e desenvolvimento de dashboards interativos.
 
+## Qualidade e testes
+
+O módulo `qualidade_dados.py` valida os dados antes de gravar o CSV, carregar o SQLite ou calcular indicadores no dashboard. Dados inválidos geram erro explícito em vez de serem descartados silenciosamente ou agregados por média.
+
+O contrato atual é específico ao indicador: Brasil, Argentina e Chile; anos inteiros de 2000 a 2024; percentuais finitos de 0 a 100; uma observação por país/ano. Lacunas de publicação são permitidas, sem imputação. Ao ampliar a coleta, atualize o contrato e os testes juntos.
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Verificado localmente em 24/10/2026: **9 testes, todos aprovados**, sem chamadas de rede. A suíte cobre normalização sem alterar a origem, esquema incompleto, base vazia, duplicatas, países/anos/percentuais inválidos, limites 0/100 e round-trip dos dados versionados entre CSV e SQLite em memória. A consulta de ranking também foi executada com sucesso.
+
+Este é um projeto de análise de indicadores públicos. Ele demonstra integração, qualidade de dados e SQL; não implementa negociação, precificação ou modelos quantitativos financeiros.
+
 ## Próximas melhorias
 
 - Ampliar a cobertura de indicadores.
-- Adicionar testes automatizados.
-- Publicar uma demonstração online do dashboard.
+- Documentar atualização e proveniência de novas extrações.
+- Automatizar a execução da suíte em integração contínua.
+

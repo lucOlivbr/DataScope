@@ -2,6 +2,7 @@
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+from qualidade_dados import validar_dados
 
 # Dados do Banco Mundial:
 # população que utiliza a internet (%)
@@ -46,7 +47,7 @@ df = pd.DataFrame(registros)
 if df.empty:
     raise RuntimeError("Nenhum dado disponível.")
 
-df = df.sort_values("Ano")
+df = validar_dados(df)
 from pathlib import Path
 
 Path("dados").mkdir(exist_ok=True)
@@ -76,3 +77,4 @@ plt.tight_layout()
 plt.savefig("grafico_internet.png", dpi=160)
 
 print("Gráfico gerado com sucesso!")
+
