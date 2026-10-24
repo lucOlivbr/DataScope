@@ -1,5 +1,4 @@
 
-import sqlite3
 from pathlib import Path
 
 import pandas as pd
@@ -101,52 +100,25 @@ st.markdown("""
 
 
 # --------------------------------------------------
-# CARREGAR DADOS DO SQLITE
+# CARREGAR E VALIDAR O SNAPSHOT CSV
 # --------------------------------------------------
 
 
 @st.cache_data
-def carregar_dados():
-    pasta = Path(__file__).parent
-    banco = pasta / "datascope.db"
-    csv = pasta / "dados" / "acesso_internet.csv"
-
-    if banco.exists():
-        with sqlite3.connect(banco) as conexao:
-            dados = pd.read_sql_query(
-                "SELECT * FROM acesso_internet",
-                conexao
-            )
-    else:
-        # Na nuvem, recria a tabela SQL a partir do CSV
-        origem = pd.read_csv(csv)
-
-        with sqlite3.connect(":memory:") as conexao:
-            origem.to_sql(
-                "acesso_internet",
-                conexao,
-                if_exists="replace",
-                index=False
-            )
-            dados = pd.read_sql_query(
-                "SELECT * FROM acesso_internet",
-                conexao
-            )
-
-    dados["Ano"] = dados["Ano"].astype(int)
-    dados["Acesso à Internet (%)"] = pd.to_numeric(
-        dados["Acesso à Internet (%)"],
-        errors="coerce"
-    )
-
-    return dados.dropna().sort_values("Ano")
+def carregar_dados(csv_bytes):
+    # Include file contents in the cache key so refreshed CSVs invalidate it.
+    import csv
+    import io
+    from pipeline import validar_registros
+    registros = csv.DictReader(io.StringIO(csv_bytes.decode("utf-8-sig")))
+    return pd.DataFrame(validar_registros(registros))
 
 
 try:
-    df = carregar_dados()
-except (sqlite3.Error, FileNotFoundError, ValueError) as erro:
+    df = carregar_dados((Path(__file__).parent / "dados" / "acesso_internet.csv").read_bytes())
+except (OSError, ValueError, UnicodeError) as erro:
     st.error(f"Não foi possível carregar os dados: {erro}")
-    st.info("Execute primeiro: python analise_sql.py")
+    st.info("Confira o CSV em dados/acesso_internet.csv e corrija a linha indicada.")
     st.stop()
 
 if df.empty:

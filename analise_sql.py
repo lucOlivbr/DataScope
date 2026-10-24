@@ -1,41 +1,19 @@
-
+"""Build the local SQLite snapshot and display the latest comparable ranking."""
 import sqlite3
-import pandas as pd
+from pipeline import ROOT, carregar_registros, criar_tabela, ranking_mais_recente
 
-# Carregar os dados coletados
-df = pd.read_csv("dados/acesso_internet.csv")
 
-# Criar o banco e executar a análise
-with sqlite3.connect("datascope.db") as conexao:
-    df.to_sql(
-        "acesso_internet",
-        conexao,
-        if_exists="replace",
-        index=False
-    )
+def main():
+    registros = carregar_registros()
+    with sqlite3.connect(ROOT / "datascope.db") as conexao:
+        criar_tabela(conexao, registros)
+        ranking = ranking_mais_recente(conexao)
+    if not ranking:
+        raise ValueError("Não há ano comum para todos os países")
+    print("Ranking no ano mais recente em comum:")
+    for pais, ano, acesso in ranking:
+        print(f"{pais}: {acesso:.2f}% ({ano})")
 
-    consulta = """
-    WITH ano_comum AS (
-        SELECT "Ano"
-        FROM acesso_internet
-        GROUP BY "Ano"
-        HAVING COUNT(DISTINCT "País") = 3
-        ORDER BY "Ano" DESC
-        LIMIT 1
-    )
-    SELECT
-        a."País",
-        a."Ano",
-        ROUND(a."Acesso à Internet (%)", 2)
-            AS "Acesso (%)"
-    FROM acesso_internet AS a
-    JOIN ano_comum AS c
-        ON a."Ano" = c."Ano"
-    ORDER BY a."Acesso à Internet (%)" DESC;
-    """
 
-    resultado = pd.read_sql_query(consulta, conexao)
-
-print("\nRanking no ano mais recente em comum:")
-print(resultado.to_string(index=False))
-print("\nConsulta SQL executada com sucesso!")
+if __name__ == "__main__":
+    main()
