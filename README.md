@@ -85,5 +85,19 @@ Projeto de portfólio desenvolvido para praticar conceitos de ciência de dados,
 ## Próximas melhorias
 
 - Ampliar a cobertura de indicadores.
-- Adicionar testes automatizados.
-- Publicar uma demonstração online do dashboard.
+- Testar a coleta da API com respostas simuladas.
+- Acrescentar indicadores com a mesma validação e cobertura de testes.
+## Qualidade dos dados e testes
+
+O dashboard lê o snapshot CSV versionado. O conteúdo do arquivo integra a chave do cache: atualizar o CSV invalida os dados em cache. O banco SQLite é uma saída da análise, não uma fonte oculta que pode divergir do CSV.
+
+`pipeline.py` valida colunas, país, ano inteiro, percentuais finitos entre 0 e 100 e unicidade por país/ano. Dados inválidos são rejeitados com a linha indicada. A consulta usa parâmetros SQL e encontra o último ano comum aos países selecionados, sem presumir sempre três países.
+
+```bash
+python -m unittest discover -s tests -v
+python analise_sql.py
+```
+
+Os nove testes usam somente a biblioteca padrão, sem rede: snapshot real, seleção variável, anos sem correspondência, duplicação, dados inválidos e preservação da base anterior quando a validação falha. O CI repete os testes e executa a análise SQL. Não testa visualmente o Streamlit nem a disponibilidade da API externa.
+
+`analise_sql.py` funciona de qualquer diretório, resolvendo os caminhos a partir do projeto. A coleta em `main.py` ainda deve ser executada na raiz. Depois da coleta, rode a análise para validar a base. O período 2000–2024 é o recorte do snapshot, não uma promessa de dados em tempo real.
