@@ -1,5 +1,7 @@
 # 📊 DataScope — Internet Access Analytics
 
+[![Python data quality](https://github.com/lucOlivbr/DataScope/actions/workflows/python-tests.yml/badge.svg)](https://github.com/lucOlivbr/DataScope/actions/workflows/python-tests.yml)
+
 ### 🚀 Demonstração online
 
 👉 [Acessar o DataScope — Dashboard Interativo](https://datascope-lucolivbr.streamlit.app/)
@@ -97,9 +99,10 @@ Verificado localmente em 24/10/2026: **9 testes, todos aprovados**, sem chamadas
 
 Este é um projeto de análise de indicadores públicos. Ele demonstra integração, qualidade de dados e SQL; não implementa negociação, precificação ou modelos quantitativos financeiros.
 
+A integração contínua em `.github/workflows/python-tests.yml` executa a suíte em Python 3.12 a cada push em `main`, pull request ou acionamento manual. O fluxo instala as dependências do projeto, verifica sua consistência com `pip check` e confere a sintaxe dos módulos. Os testes usam dados versionados e SQLite em memória, sem consultar a API do Banco Mundial. O estado da execução mais recente pode ser consultado no badge acima.
+
 ## Próximas melhorias
 
 - Ampliar a cobertura de indicadores.
 - Documentar atualização e proveniência de novas extrações.
-- Automatizar a execução da suíte em integração contínua.
 
