@@ -1,0 +1,40 @@
+name: Python data quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Python 3.12 data quality tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install project dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Check dependency consistency
+        run: python -m pip check
+
+      - name: Check Python syntax
+        run: python -m compileall -q main.py analise_sql.py qualidade_dados.py app.py
+
+      - name: Run offline data quality tests
+        run: python -m unittest discover -s tests -v
